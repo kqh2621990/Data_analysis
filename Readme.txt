@@ -20,11 +20,11 @@ ESTIMATED LEVEL
   I > 9 	: Very Difficult level     
 ---------------------------------------------------------------------------------------------------------------
 SOURCE CODE includes files:
-main.py 				
+main.py 	              - main code 			
 analyzer_data_boxes.py 	- Contain function to estimate the score for an image
 load_json.py            - Take information of all ground truth boxes in an image
-take_img_json.py		- Load name of .json file corresponding name of image file
-overlap.py 				- Calculate overlap area of two boxes
+take_img_json.py		    - Load name of .json file corresponding name of image file
+overlap.py 				      - Calculate overlap area of two boxes
 
 
 
