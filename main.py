@@ -26,15 +26,21 @@ from ultilis import *
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
-    ap.add_argument('-i','--image_path', required=True, help='provide directory of image')
-    ap.add_argument('-j', '--json_file_path', required=True, help='provide directory of .json file')
-    ap.add_argument('-s', '--standard_image_size', required=True, help='provide the standard image size')
-    args = vars(ap.parse_args())
+    # ap = argparse.ArgumentParser()
+    # ap.add_argument('-i','--image_path', required=True, help='provide directory of image')
+    # ap.add_argument('-j', '--json_file_path', required=True, help='provide directory of .json file')
+    # ap.add_argument('-s', '--standard_image_size', required=True, help='provide the standard image size')
+    # args = vars(ap.parse_args())
 
-    path_img = args['image_path']
-    path_json= args['json_file_path']
-    standard_image_size = int(args['standard_image_size'])
+    # # hoang code 
+    path_img = "/media/minhhoang/Data/dataPerson/MOT20/test/MOT20-04/some_img/"
+    path_json = "/media/minhhoang/Data/dataPerson/data_test_person/GT/MOT20real_format/mot20-04/"
+    standard_image_size = 1668600
+    # #end
+    
+    # path_img = args['image_path']
+    # path_json= args['json_file_path']
+    # standard_image_size = int(args['standard_image_size'])
 
     ezimgs = "Datatest\\easy_img.txt"
     ezjson = "Datatest\\easy_json.txt"
@@ -47,8 +53,11 @@ if __name__ == "__main__":
 
     #path_img = "C:\\Users\\Admin\\Desktop\\Em_HOANG\\SCUT_HEAD_Part_B\\SCUT_HEAD_Part_B\\JPEGImages\\"
     #path_json = "C:\\Users\\Admin\\Desktop\\Em_HOANG\\scutB_head_gt\\scutB_head_gt\\"
-
-    for info in take_img_info_from_json(path_json, path_img, ezimgs, ezjson, norimgs, norjson, hardimgs, hardjson):
+    infomation = take_img_info_from_json(path_json, path_img, ezimgs, ezjson, norimgs, norjson, hardimgs, hardjson)
+    print(infomation)
+    if not os.path.exists(os.getcwd()+'/output'):
+        os.mkdir(os.getcwd()+'/output')
+    for info in infomation:
         info_boxes = info[0]
         img_size = info[1]
         img_path = info[2]
@@ -63,15 +72,15 @@ if __name__ == "__main__":
 
         if mean_I < 7:
             "cho vao bo Easy"
-            path = os.getcwd()+'\\output\\Easy.txt'
+            path = os.getcwd()+'/output/Easy.txt'
             write_txt(path, img_path)
         if 7 < mean_I < 8:
             "cho vao bo Intermediate"
-            path = os.getcwd() + '\\output\\Intermediate.txt'
+            path = os.getcwd() + '/output/Intermediate.txt'
             write_txt(path, img_path)
         if mean_I > 8:
             "cho vao bo Hard"
-            path = os.getcwd() + '\\output\\Hard.txt'
+            path = os.getcwd() + '/output/Hard.txt'
             write_txt(path, img_path)
 
 

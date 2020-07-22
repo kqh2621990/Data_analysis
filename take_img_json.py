@@ -69,6 +69,7 @@ def take_img_info_from_json(path_json, path_img, ezimgs, ezjson, norimgs, norjso
     lst_json = check_imgs(path_json)
     lst_json = sorted(lst_json)
     num_img = len(lst_json)
+    print(num_img)
     path_ez_imgs = []
     path_ez_jsons = []
 
@@ -81,7 +82,8 @@ def take_img_info_from_json(path_json, path_img, ezimgs, ezjson, norimgs, norjso
     count = 0
 
     for image_path in lst_json:
-        name_img = image_path.split("\\")[-1]
+        print(count)
+        name_img = image_path.split("/")[-1]
         name_img = name_img.replace('json', 'jpg')
         image_path = os.path.join(path_img, name_img)
         print(image_path)
@@ -90,7 +92,7 @@ def take_img_info_from_json(path_json, path_img, ezimgs, ezjson, norimgs, norjso
         gts, img_gt, info_boxes = load_json(path_json, name_json, img=img, crop=False)
         json_path = path_json + name_img + ".json"
         img_size = img.shape[0] * img.shape[1]
-
+        count +=1 
         yield info_boxes, img_size, image_path
 '''
         print('Name of image {} Image size {} '.format(name_img, img_size))
