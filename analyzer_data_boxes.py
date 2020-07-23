@@ -48,6 +48,7 @@ class DataAnalysis:
         center = np.zeros((d, 2))
         center[i,] = [ifb[i][0] + ifb[i][2] / 2, ifb[i][1] + ifb[i][3] / 2]
         return center
+        
     @property
     def _data_analyzer(self):
         '''

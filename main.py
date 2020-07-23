@@ -26,29 +26,37 @@ from ultilis import *
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
-    ap.add_argument('-i','--image_path', required=True, help='provide directory of image')
-    ap.add_argument('-j', '--json_file_path', required=True, help='provide directory of .json file')
-    ap.add_argument('-s', '--standard_image_size', required=True, help='provide the standard image size')
-    args = vars(ap.parse_args())
+    # ap = argparse.ArgumentParser()
+    # ap.add_argument('-i','--image_path', required=True, help='provide directory of image')
+    # ap.add_argument('-j', '--json_file_path', required=True, help='provide directory of .json file')
+    # ap.add_argument('-s', '--standard_image_size', required=True, help='provide the standard image size')
+    # args = vars(ap.parse_args())
 
-    path_img = args['image_path']
-    path_json= args['json_file_path']
-    standard_image_size = int(args['standard_image_size'])
+    path_img = "/media/minhhoang/Data/dataPerson/Datatest/easy_img.txt"
+    path_json= "/media/minhhoang/Data/dataPerson/Datatest/easy_json.txt"
+    dir_data = "/media/minhhoang/Data/dataPerson/"
+    standard_image_size = 518400
 
-    ezimgs = "Datatest\\easy_img.txt"
-    ezjson = "Datatest\\easy_json.txt"
+    ezimgs = "Datatest/easy_img.txt"
+    ezjson = "Datatest/easy_json.txt"
 
-    norimgs = "Datatest\\nor_imgs.txt"
-    norjson = "Datatest\\nor_json.txt"
+    norimgs = "Datatest/nor_imgs.txt"
+    norjson = "Datatest/nor_json.txt"
 
-    hardimgs = "Datatest\\hard_imgs.txt"
-    hardjson = "Datatest\\hard_json.txt"
+    hardimgs = "Datatest/hard_imgs.txt"
+    hardjson = "Datatest/hard_json.txt"
 
-    #path_img = "C:\\Users\\Admin\\Desktop\\Em_HOANG\\SCUT_HEAD_Part_B\\SCUT_HEAD_Part_B\\JPEGImages\\"
-    #path_json = "C:\\Users\\Admin\\Desktop\\Em_HOANG\\scutB_head_gt\\scutB_head_gt\\"
+    #path_img = "C:/Users/Admin/Desktop/Em_HOANG/SCUT_HEAD_Part_B/SCUT_HEAD_Part_B/JPEGImages/"
+    #path_json = "C:/Users/Admin/Desktop/Em_HOANG/scutB_head_gt/scutB_head_gt/"
 
-    for info in take_img_info_from_json(path_json, path_img, ezimgs, ezjson, norimgs, norjson, hardimgs, hardjson):
+    # for info in take_img_info_from_json(path_json, path_img):
+    values = []
+    means = []
+    stds = []
+    idx = 0
+    for info in take_img_info_from_txt(path_json, path_img, dir_data):
+        idx += 1
+        # if idx <= 100:
         info_boxes = info[0]
         img_size = info[1]
         img_path = info[2]
@@ -57,22 +65,27 @@ if __name__ == "__main__":
         E = A._data_analyzer
         mean_E = np.mean(E)
         std_E = np.std(E)
-        print("In ra thong tin muc do danh gia overlap")
-        print(E)
-        print(" In ra thong tin danh gia E trung binh va standard deviation", mean_E, std_E)
-
+        values.append(E)
+        means.append(mean_E)
+        stds.append(std_E)
+        print('processing of %d' % (idx + 1))
         if mean_E < 7:
             "cho vao bo Easy"
-            path = os.getcwd()+'\\output\\Easy_crow.txt'
+            path = os.getcwd() + '/outputez/Easy_crow.txt'
             write_txt(path, img_path)
         if 7 < mean_E < 8:
             "cho vao bo Intermediate"
-            path = os.getcwd() + '\\output\\Intermediate_crow.txt'
+            path = os.getcwd() + '/outputez/Intermediate_crow.txt'
             write_txt(path, img_path)
         if mean_E > 8:
             "cho vao bo Hard"
-            path = os.getcwd() + '\\output\\Hard_crow.txt'
+            path = os.getcwd() + '/outputez/Hard_crow.txt'
             write_txt(path, img_path)
+        # else:
+        #     break
 
-
+    import matplotlib.pyplot as plt
+    plt.figure(dpi=150)
+    plt.plot(np.sort(np.array(means)), 'ro')
+    plt.show()
 

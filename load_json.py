@@ -107,7 +107,38 @@ def load_json(directory, nameOfImage, box_img=None, p_save_img=None, img=None, c
         # cv2.imwrite(save_img, img)
         return gts, img, info_boxes
 
+def load_json(path_json=None, img=None):
+    gts = []
+    with open(path_json) as f:
+        fh1 = json.load(f)
+        '''brainwash'''
+        # _ , nameOfImage = nameOfImage.split("-")
+        '''end'''
+        info_boxes = []   
+        nameOfImage = "hoang"                          # bao gom 4 thong so cua cac box
+        for idx, line in enumerate(fh1['objects']):
+            gt = []
+            gt.append(nameOfImage)
+            # print(line['label'])
+            gt.append(line['label'])
+            gt.append(1)
+            x = int(line['bbox']['x_topleft'])  # x_topleft
+            y = int(line['bbox']['y_topleft'])  # y_topleft
+            w = int(line['bbox']['w'])
+            h = int(line['bbox']['h'])
+            # HUY BO SUNG ###########################
+            print("x=", x, "y=", y, "w=", w, "h=", h)
+            info_boxes.append([x, y, w, h])
+            tup = tuple([x, y, x + w, y + h])
+            # print(tup)
+            gt.append(tup)
+            # print(xnew, ynew, wnew, hnew)
+            image = cv2.putText(img, str(idx + 1), (x - 5, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),
+                                1, cv2.LINE_AA)
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
+            gts.append(gt)
+    return gts, img, info_boxes
 def random_crop(p_img, folder_json, p_save_img, crop=True, new_size=(320, 240)):
     orig_image = cv2.imread(p_img)
     image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB)
