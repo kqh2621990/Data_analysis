@@ -1,8 +1,18 @@
 from load_json import *
 from ultilis import read_text
 import cv2
-import imghdr
-lines = read_text("/home/minhhoang/Desktop/Data_analysis/outputez/Hard_crow.txt")
+import os
+
+
+# target = r'C:\Users\Admin\Desktop\project1\Image_data_analyzer\Output\Normal_dataset-Intermediate.txt'
+# container = open(target, 'r')
+# for line in container.readlines():
+#     path_to_image = line.split(' ')[0]
+#     image = cv2.imread(path_to_image)
+#     cv2.imshow('test', image)
+#     cv2.waitKey()
+#     cv2.destroyAllWindows()
+
 '''
 for line in lines:
     image = cv2.imread(line)
@@ -10,24 +20,31 @@ for line in lines:
 
 cv2.destroyAllWindows()
 '''
-path_images = open("/home/minhhoang/Desktop/Data_analysis/outputez/Hard_crow.txt").read().splitlines()
 
-path_json = open("/media/minhhoang/Data/dataPerson/Datatest/easy_json.txt").read().splitlines()
 
-dir_data = "/media/minhhoang/Data/dataPerson/"
-for p_img in path_images:
-    for p_json in path_json:
-        name_img = p_img.split("/")[-1]
-        type_img = imghdr.what(p_img)
-        if type_img == "jpeg" or type_img == None:
-            type_img = "jpg"
-        
-        name_json, _ = name_img.split("." + type_img)
-        
-        if name_json in p_json:
-            p_json = dir_data + p_json
-            img  = cv2.imread(p_img)
-            gts, img_gt, info_boxes = load_json(path_json=p_json, img=img)
-            cv2.imshow("imgGT", img_gt)
-            cv2.waitKey()
+count = 0
+target = r'C:\Users\Admin\Desktop\project1\Image_data_analyzer\Output\Hard_dataset-Hard.txt'
+container = open(target, 'r')
+for line in container.readlines():
+    print(line)
+    path_to_image = line.split(' ')[0]
+    name_split = path_to_image.split(" ")[0]
+    name_img = path_to_image.split("\\")[-1]
+    #name_img = line.split(" ")[-1]
+    #name, _ = name_img.split(".jpg")
+    name, extend = os.path.splitext(name_img)
+
+    name_json = name + ".json"
+    path_json = r"D:\Huy\datasets\ahuyboom\hard\json"
+    path_json =os.path.join(path_json,name_json)
+    print('path_json',path_json)
+
+
+    img  = cv2.imread(name_split)
+    gts, img_gt, info_boxes = load_json(path_json, img)
+    cv2.imshow("imgGT", img_gt)
+    # nbcv2.imshow("iamge",img)
+    cv2.waitKey()
+    count = count +1
+    print('dem so anh ',count)
     cv2.destroyAllWindows()

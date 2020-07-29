@@ -48,7 +48,6 @@ class DataAnalysis:
         center = np.zeros((d, 2))
         center[i,] = [ifb[i][0] + ifb[i][2] / 2, ifb[i][1] + ifb[i][3] / 2]
         return center
-        
     @property
     def _data_analyzer(self):
         '''
@@ -56,45 +55,57 @@ class DataAnalysis:
                 - visible ratio of a ground truth box,
                 - relative size of ground truth box in comparison to the image size
         :return:
-                I : estimated score for an image
+                E                       : estimated score for an image
+                mean_box_normed_size    : mean of normed box size
+                overlap_mean            : mean of number of overlap
+
+
         '''
         d = self.get_box_num()
-        ifb = np.array(self.info_boxes)
-        box_normed_size = np.zeros(d)
-        box = np.zeros((d, 4))
-        for i in range(0, d):
-            box[i,] = [ifb[i][0], ifb[i][1], ifb[i][0] + ifb[i][2], ifb[i][1] + ifb[i][3]]
-            box_normed_size[i] = ifb[i][2] * ifb[i][3] / self.img_size  # kich thuoc tuong doi cua box so voi image
-        # he so chuan hoa size of image so voi khung chuan
-        if self.img_size > self.standard_image_size:
-            norm_para = 1
-        else:
-            norm_para = self.img_size / self.standard_image_size
+        if d > 0:
+            ifb = np.array(self.info_boxes)
+            box_normed_size = np.zeros(d)
+            box = np.zeros((d, 4))
+            for i in range(0, d):
+                box[i,] = [ifb[i][0], ifb[i][1], ifb[i][0] + ifb[i][2], ifb[i][1] + ifb[i][3]]
+                # kich thuoc tuong doi cua box so voi image
+                box_normed_size[i] = ifb[i][2] * ifb[i][3] / self.img_size  
+                mean_box_normed_size = np.mean(box_normed_size)
+            # he so chuan hoa size of image so voi khung chuan
+            if self.img_size > self.standard_image_size:
+                norm_para = 1
+            else:
+                norm_para = self.img_size / self.standard_image_size
 
-        # Calculate Overlap area of two boxes
-        overlap_matrix = np.zeros((d, d))   #  ma tran mo ta overlap cua cac box voi nhau : 1 la overlap ; 0 la non-overlap
-        overlap_area = np.zeros((d, d))     # ma tran chua dien tich overlap cua cac box voi nhau
-        for i in range(0, d - 1):
-            l1 = ol.Point(box[i][0], box[i][1])
-            r1 = ol.Point(box[i][2], box[i][3])
-            for j in range(i + 1, d):
-                l2 = ol.Point(box[j][0], box[j][1])
-                r2 = ol.Point(box[j][2], box[j][3])
-                if do_overlap(l1, r1, l2, r2):
-                    overlap_matrix[i, j] = overlap_matrix[j, i] = 1
-                    overlap_area[i, j] = overlap_area[j, i] = intersec_area(l1, r1, l2, r2)
-        overlap_mean = np.sum(overlap_matrix) / d
+            # Calculate Overlap area of two boxes
+            overlap_matrix = np.zeros((d, d))   #  ma tran mo ta overlap cua cac box voi nhau : 1 la overlap ; 0 la non-overlap
+            overlap_area = np.zeros((d, d))     # ma tran chua dien tich overlap cua cac box voi nhau
+            for i in range(0, d - 1):
+                l1 = ol.Point(box[i][0], box[i][1])
+                r1 = ol.Point(box[i][2], box[i][3])
+                for j in range(i + 1, d):
+                    l2 = ol.Point(box[j][0], box[j][1])
+                    r2 = ol.Point(box[j][2], box[j][3])
+                    if do_overlap(l1, r1, l2, r2):
+                        overlap_matrix[i, j] = overlap_matrix[j, i] = 1
+                        overlap_area[i, j] = overlap_area[j, i] = intersec_area(l1, r1, l2, r2)
+            overlap_mean = np.sum(overlap_matrix) / d
+            print('overlap_mean =', overlap_mean )
 
-        #  Calculate the non-overlap part of each box, using it to estimate score for the image
-        I = np.ones(d, dtype=float)
-        for i in range(0, d):
-            for j in range(0, d):
-                if overlap_matrix[i, j] == 1:
-                    I[i] = 1 - overlap_area[i, j] / (ifb[i][2] * ifb[i][3])
-        # I = -np.log2(norm_para * np.multiply(I, box_normed_size))
-        if overlap_mean < 1:
-            E = -np.log2(np.multiply(I, box_normed_size))
-        else:
-            E = -np.log2(np.multiply(I, box_normed_size)) + np.log2(overlap_mean)
-        return E
+            #  Calculate the non-overlap part of each box, using it to estimate score for the image
+            I = np.ones(d, dtype=float)
+            for i in range(0, d):
+                for j in range(0, d):
+                    if overlap_matrix[i, j] == 1:
+                        I[i] = 1 - overlap_area[i, j] / (ifb[i][2] * ifb[i][3])
+                if I[i] <= 0:
+                    I[i] = 1
+
+            # I = -np.log2(norm_para * np.multiply(I, box_normed_size))
+
+            if overlap_mean < 1:
+                E = -np.log2(np.multiply(I, box_normed_size))
+            else:
+                E = -np.log2(np.multiply(I, box_normed_size)) + np.log2(overlap_mean)
+            return E, mean_box_normed_size, overlap_mean
 

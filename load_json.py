@@ -107,14 +107,14 @@ def load_json(directory, nameOfImage, box_img=None, p_save_img=None, img=None, c
         # cv2.imwrite(save_img, img)
         return gts, img, info_boxes
 
-def load_json(path_json=None, img=None):
+def load_json(path_json = None, img = None):
     gts = []
     with open(path_json) as f:
         fh1 = json.load(f)
         '''brainwash'''
         # _ , nameOfImage = nameOfImage.split("-")
         '''end'''
-        info_boxes = []   
+        info_boxes = []
         nameOfImage = "hoang"                          # bao gom 4 thong so cua cac box
         for idx, line in enumerate(fh1['objects']):
             gt = []
@@ -139,6 +139,7 @@ def load_json(path_json=None, img=None):
 
             gts.append(gt)
     return gts, img, info_boxes
+
 def random_crop(p_img, folder_json, p_save_img, crop=True, new_size=(320, 240)):
     orig_image = cv2.imread(p_img)
     image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB)
